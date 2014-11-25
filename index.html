@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>BLE Demo</title>
+    <link rel="stylesheet" href="style/headers.css" type="text/css" />
+    <link rel="stylesheet" href="style/lists.css" type="text/css" />
+    <link rel="stylesheet" href="main.css" type="text/css" />
+    <!-- Specific code -->
+    <script type="text/javascript" defer src="main.js"></script>
+</head>
+  <body>
+    <div class="skin-organic">
+    <section role="region">
+      <header>
+        <menu type="toolbar">
+          <button><span class="icon icon-add">add</span></button>
+        </menu>
+        <h1>BLE Demo App</h1>
+      </header>
+      <header>
+        <h2>Status</h2>
+      </header>
+      <section data-type="list">
+    	<header id='conn-status'>Connection status: </header>
+      <header>BPM </header>
+    	<ul>
+          <li>
+            <p><strong>110</strong></p>
+          </li>
+        </ul>
+      </section>
+      <header>
+        <h2>Connect with HRM</h2>
+      </header>
+      <section data-type="list">
+         <menu type="toolbar">
+        <button id='search-device'>Discovery</button>
+         </menu>
+    	<ul id="device-list">
+          <li>
+            <p><strong>Device lists</strong></p>
+          </li>
+        </ul>
+      </section>
+    </section>
+  </div>
+  </body>
+</html>
