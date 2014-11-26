@@ -6,46 +6,64 @@
     <title>BLE Demo</title>
     <link rel="stylesheet" href="style/headers.css" type="text/css" />
     <link rel="stylesheet" href="style/lists.css" type="text/css" />
+    <link rel="stylesheet" href="style/switches.css" type="text/css" />
+    <link rel="stylesheet" href="style/buttons.css" type="text/css" />
+    <link rel="stylesheet" href="style/action_menu.css" type="text/css" />
     <link rel="stylesheet" href="main.css" type="text/css" />
     <!-- Specific code -->
     <script type="text/javascript" defer src="main.js"></script>
 </head>
   <body>
     <div class="skin-organic">
-    <section role="region">
-      <header>
-        <menu type="toolbar">
-          <button><span class="icon icon-add">add</span></button>
-        </menu>
-        <h1>BLE Demo App</h1>
-      </header>
-      <header>
-        <h2>Status</h2>
-      </header>
-      <section data-type="list">
-        <div id='conn-status'>Connection status: </div> 
-      <header>BPM </header>
-    	<ul>
-          <li>
-            <p><strong>110</strong></p>
-          </li>
-        </ul>
+      <section role="region">
+        <header>
+          <h1>BLE Demo App</h1>
+        </header>
+        <header>
+          <h2>Status</h2>
+        </header>
+        <section data-type="list">
+          <div id='conn-status'>Connection status: </div>
+          <header>BPM </header>
+            <ul>
+              <li>
+                <p><strong>110</strong></p>
+              </li>
+            </ul>
+        </section>
+        <header>
+          <h2>Connect with HRM</h2>
+        </header>
+        <section data-type="list">
+          <ul>
+            <li id="search-list">
+              <button id="search-device">Discover</button>
+            </li>
+            <label id="bluetooth-switch" class="pack-switch">
+              <input id="bluetooth-switch-input" type="checkbox">
+              <span></span>
+            </label>
+            <li>
+              <button id='start-register-noti'>Start Notification</button>
+            </li>
+          </ul>
+        </section>
+        <section id="list-anchor" data-type="list">
+          <ul id="device-list">
+            <li>
+              <p><strong>Searching...</strong></p>
+            </li>
+          </ul>
+        </section>
       </section>
-      <header>
-        <h2>Connect with HRM</h2>
-      </header>
-      <section data-type="list">
-         <menu type="toolbar">
-        <button id='search-device'>Discovery</button>
-         <button id='start-register-noti'>Start Notification</button>
-         </menu>
-    	<ul id="device-list">
-          <li>
-            <p><strong>Device lists</strong></p>
-          </li>
-        </ul>
-      </section>
-    </section>
-  </div>
+    </div>
+    <form id="options-dialog" role="dialog" data-type="action" hidden>
+      <header>Options</header> <!-- this header is optional -->
+      <menu type="toolbar">
+        <button id="connect">Connect</button>
+        <button id="disconnect">Disconnect</button>
+        <button id="cancel">Cancel</button>
+      </menu>
+    </form>
   </body>
 </html>
