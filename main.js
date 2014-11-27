@@ -112,9 +112,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
            console.log("Connection state changed to", gatt.connectionState);
            gattConnectState.textContent = 'Connection state:  ' + gatt.connectionState;
           };
+
+         // gatt onconnectionstatechanged
+         gatt.oncharacteristicchanged = function onCharacteristicChanged(evt) {
+           var hrmChar = evt.characteristic;
+           console.log("The value of characteristic (uuid:", hrmChar.uuid, ") changed to", hrmChar.value);
+         }
        }, function onReject(reason){
          console.log('connectGatt reject');
-       });
+       }); //connectGatt resolve
     }
   }
 
