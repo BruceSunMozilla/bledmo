@@ -1,5 +1,9 @@
 /*
  * BLE Demo App based on bluetooth v2 api. https://wiki.mozilla.org/B2G/Bluetooth/WebBluetooth-v2
+ * GATT Service UUID: https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx
+ * GATT Characteristics:  https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx
+ * TODO:
+ * 1. Gecko UUID translation
  */
 
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -8,11 +12,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var bluetooth = window.navigator.mozBluetooth;
   var defaultAdapter = null;
   var searchAgainBtn = null;
+  var startNotiBtn = null;
   var discoveryHandler = null;
   var isGattClientConnected = null;
   var gattConnectState = null;
+  var gattClient = null;
+  var gattHrmChar = null;
+  var HRM_SERVERVICE_UUID = 'fb349b5f-8000-0080-0010-00000d180000';
   searchAgainBtn = document.getElementById('search-device');
-  connectState = document.getElementById('conn-status');
+  gattConnectState = document.getElementById('conn-status');
+  startNotiBtn = document.getElementById('start-register-noti');
   defaultAdapter =  bluetooth.defaultAdapter;
   if (defaultAdapter) {
     console.log('defaultAdapter get!');
@@ -93,13 +102,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
       console.log('!!!!!!! Found Polar!!!!!!!');
       device.connectGatt(false).then(function onResolve(gatt){
          console.log('connectGatt, onResolve');
+         gattClient = gatt;
+        console.log('-------------> after resolved connection state:  ' + gatt.connectionState);
+        if (gatt.connectionState === 'connected') {
+          gattConnectState.textContent = 'Connection state:  ' + gatt.connectionState;
+        }
          // gatt.connectionState
-         console.log('Connect with the HRM, connection state: ' + gatt.connectionState);                            
+         gatt.onconnectionstatechanged = function onConnectionStateChanged() {
+           console.log("Connection state changed to", gatt.connectionState);
+           gattConnectState.textContent = 'Connection state:  ' + gatt.connectionState;
+          };
        }, function onReject(reason){
          console.log('connectGatt reject');
        });
     }
   }
+
   searchAgainBtn.onclick = function searchAgainClick() {
     if (defaultAdapter) {
       console.log('---------btn press, start discovery --------');
@@ -117,6 +135,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
        }, function onReject(reason) {
          console.log('--> startDiscovery failed: reason = ' + reason);
        }); //startdiscovery resolve
+    }
+  };
+  
+  startNotiBtn.onclick = function startNotiBtnClick() {
+    if (defaultAdapter && gattClient){
+      for (var i in gattClient.services) {
+        console.log('GattService uuid:' + gattClient.services[i].uuid); 
+        console.log('GattService instanceid:' + gattClient.services[i].instanceId);
+        console.log('GattService isPrimary:' + gattClient.services[i].isPrimary);
+        if (gattClient.services[i].uuid === HRM_SERVERVICE_UUID) {
+          console.log('Found HRM Service!!!!');
+          gattHrmChar = gattClient.services[i].characteristics[0];
+          break;
+        }
+      }
+      console.log('HRM CHAR: Starting notification');
+      gattHrmChar.startNotifications();
     }
   };
 
