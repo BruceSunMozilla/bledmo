@@ -27,3 +27,11 @@ body {
   overflow-y: auto;
   height: 20rem;
 }
+
+#start-register {
+  float: left;
+}
+
+#start-register-noti {
+  margin: 1rem 0;
+}
