@@ -7,8 +7,6 @@
  */
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  console.log("DOM fully loaded and parsed");
-
   var bluetooth = window.navigator.mozBluetooth;
   var defaultAdapter = null;
   var searchAgainBtn = null;
@@ -16,19 +14,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var discoveryHandler = null;
   var isGattClientConnected = null;
   var gattConnectState = null;
+
   var gattClient = null;
   var gattHrmChar = null;
   var HRM_SERVERVICE_UUID = 'fb349b5f-8000-0080-0010-00000d180000';
-  searchAgainBtn = document.getElementById('search-device');
+
   gattConnectState = document.getElementById('conn-status');
   startNotiBtn = document.getElementById('start-register-noti');
+  bluetoothSwitch = document.getElementById('bluetooth-switch-input');
+  searchAgainBtn = document.getElementById('search-device');
+  optionsDialog = document.getElementById('options-dialog');
+  connectButton = document.getElementById('connect');
+  disconnectButton = document.getElementById('disconnect');
+  cancelButton = document.getElementById('cancel');
+  connectState = document.getElementById('conn-status');
+
   defaultAdapter =  bluetooth.defaultAdapter;
+
   if (defaultAdapter) {
     console.log('defaultAdapter get!');
   } else {
-     console.log('defaultAdapter not get! We need to wait adapter added');
+    console.log('defaultAdapter not get! We need to wait adapter added');
   }
-  
+
   bluetooth.onattributechanged = function onManagerAttributeChanged(evt) {
     console.log('register adapterchanged');
     for (var i in evt.attrs) {
@@ -68,21 +76,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
           enableBluetooth();
           break;
         default:
-           break;
+          break;
        }
     }
- };
+  };
 
   function enableBluetooth() {
     console.log('enable bluetooth');
     defaultAdapter.enable();
   }
- 
+
   function disableBluetooth() {
     console.log('disable bluetooth');
     defaultAdapter.disable();
   }
-
 
   function addDeviceToList(device) {
     var li = document.createElement('li');
@@ -92,8 +99,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     var list = document.getElementById('device-list');
     list.appendChild(li);
+
+    li.oncontextmenu = function(evt) {
+      evt.preventDefault();
+      var target = evt.target;
+
+      optionsDialog.hidden = false;
+    }
   }
-  
+
   function connectGattServer(device) {
     console.log('Device name:' + device.name);
     console.log('Device address:' + device.address);
@@ -124,23 +138,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
   }
 
+  bluetoothSwitch.onchange = function bluetoothSwitchClick(evt) {
+    var checked = evt.target.checked;
+
+    if (checked) {
+      enableBluetooth();
+    } else {
+      disableBluetooth();
+    }
+  };
+
   searchAgainBtn.onclick = function searchAgainClick() {
     if (defaultAdapter) {
       console.log('---------btn press, start discovery --------');
       // clean up device list
       var list = document.getElementById('device-list');
-      while (list.firstChild) list.removeChild(list.firstChild);
-      
+      list.innerHTML = '';
+
       defaultAdapter.startDiscovery().then(function onResolve(handle) {
         discoveryHandler = handle;
         discoveryHandler.ondevicefound = function onDeviceFound(evt) {
-         console.log('-->_onDeviceFound(): evt = ' + evt);
-         addDeviceToList(evt.device);
-         connectGattServer(evt.device); 
+          console.log('-->_onDeviceFound(): evt = ' + evt);
+          addDeviceToList(evt.device);
+          connectGattServer(evt.device);
         } // ondevice found
-       }, function onReject(reason) {
-         console.log('--> startDiscovery failed: reason = ' + reason);
-       }); //startdiscovery resolve
+      }, function onReject(reason) {
+        console.log('--> startDiscovery failed: reason = ' + reason);
+      }); //startdiscovery resolve
     }
   };
   
@@ -161,4 +185,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
   };
 
-}); //DOMContentLoaded
+  optionsDialog.onsubmit = function(evt) {
+    evt.preventDefault();
+  };
+
+  connectButton.onclick = function(evt) {
+    // connect the device
+    optionsDialog.hidden = true;
+  };
+
+  disconnectButton.onclick = function(evt) {
+    // disconnect the device
+    optionsDialog.hidden = true;
+  };
+
+  cancelButton.onclick = function(evt) {
+    // hide the options dialog
+    optionsDialog.hidden = true;
+  };
+});
