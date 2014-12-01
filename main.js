@@ -19,9 +19,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var gattClient = null;
   var gattHrmChar = null;
   var HRM_SERVERVICE_UUID = 'fb349b5f-8000-0080-0010-00000d180000';
+  var cccDescriptor;
+  var hrmmeasurementTxt;
   searchAgainBtn = document.getElementById('search-device');
   gattConnectState = document.getElementById('conn-status');
   startNotiBtn = document.getElementById('start-register-noti');
+  hrmmeasurementTxt = document.getElementById('hrm-measurement');
   defaultAdapter =  bluetooth.defaultAdapter;
   if (defaultAdapter) {
     console.log('defaultAdapter get!');
@@ -98,8 +101,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     console.log('Device name:' + device.name);
     console.log('Device address:' + device.address);
     /* TODO: Remove it when we added connect options*/
-    if (device.name === 'Polar H7 2AA27B') {
-      console.log('!!!!!!! Found Polar!!!!!!!');
+    if (device.name === 'Polar H7 2AA27B' || device.name === 'Wahoo HRM V1.7') {
+      console.log('!!!!!!! Found HRM !!!!!!  ');
       device.connectGatt(false).then(function onResolve(gatt){
          console.log('connectGatt, onResolve');
          gattClient = gatt;
@@ -116,7 +119,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
          // gatt onconnectionstatechanged
          gatt.oncharacteristicchanged = function onCharacteristicChanged(evt) {
            var hrmChar = evt.characteristic;
-           console.log("The value of characteristic (uuid:", hrmChar.uuid, ") changed to", hrmChar.value);
+           console.log("The value of characteristic uuid:" + hrmChar.uuid);
+           if (hrmChar.value) {
+             var valueBytes = new Uint8Array(hrmChar.value);
+             if (valueBytes.length < 2) {
+               console.log('Invalid Heart Rate Measurement value');
+               return;
+             }
+             var flags = valueBytes[0];
+             var hrFormat = flags & 0x01;
+             var sensorContactStatus = (flags >> 1) & 0x03;
+             var eeStatus = (flags >> 3) & 0x01;
+             var rrBit = (flags >> 4) & 0x01;
+             var heartRateMeasurement;
+             var energyExpanded;
+             var rrInterval;
+             var minLength = hrFormat == 1 ? 3 : 2;
+             if (valueBytes.length < minLength) {
+               console.log('Invalid Heart Rate Measurement value');
+               return;
+             }
+             if (hrFormat == 0) {
+               console.log('8-bit Heart Rate format');
+               heartRateMeasurement = valueBytes[1];
+               console.log(' Heart Rate Measurement: ' + heartRateMeasurement);
+               hrmmeasurementTxt.textContent = heartRateMeasurement;
+             } else {
+               console.log('16-bit Heart Rate format');
+               heartRateMeasurement = valueBytes[1] | (valueBytes[2] << 8);
+               console.log(' Heart Rate Measurement: ' + heartRateMeasurement);
+             }
+           }
          }
        }, function onReject(reason){
          console.log('connectGatt reject');
@@ -156,8 +189,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
           break;
         }
       }
+
       console.log('HRM CHAR: Starting notification');
       gattHrmChar.startNotifications();
+      console.log('HRM CHAR: Write CCCD to enable descriptor');
+      cccDescriptor = gattHrmChar.descriptors[0];
+      var enableNotification = new ArrayBuffer(2);
+      enableNotification[0] = 0x01;
+      enableNotification[1] = 0x00;
+      cccDescriptor.writeValue(enableNotification);
     }
   };
 
