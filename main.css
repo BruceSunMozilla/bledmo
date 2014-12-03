@@ -2,3 +2,18 @@ html, body {
   font-size: 10px;
 }
 
+#conn-status {
+  font-size: 18px;
+}
+
+#hrm-measurement {
+   font-size: 48px;
+}
+
+#search-device {
+  font-size: 14px;
+}
+
+#start-register-noti {
+  font-size: 14px;
+}

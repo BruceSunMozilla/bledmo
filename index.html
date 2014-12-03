@@ -15,7 +15,6 @@
     <section role="region">
       <header>
         <menu type="toolbar">
-          <button><span class="icon icon-add">add</span></button>
         </menu>
         <h1>BLE Demo App</h1>
       </header>
@@ -24,12 +23,13 @@
       </header>
       <section data-type="list">
         <div id='conn-status'>Connection status: </div> 
+        <div id="heart">
+          <img src="heart-rate-icon.png">
+        </div>
       <header>BPM </header>
-    	<ul>
-          <li>
-            <p><strong><div id='hrm-measurement'>----</div></strong></p>
-          </li>
-        </ul>
+      <div id="heart-rate-bpm">
+        <span id='hrm-measurement'>---</span>
+       </div>
       </section>
       <header>
         <h2>Connect with HRM</h2>

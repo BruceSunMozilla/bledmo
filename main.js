@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   } else {
      console.log('defaultAdapter not get! We need to wait adapter added');
   }
-  
+
   bluetooth.onattributechanged = function onManagerAttributeChanged(evt) {
     console.log('register adapterchanged');
     for (var i in evt.attrs) {
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     console.log('enable bluetooth');
     defaultAdapter.enable();
   }
- 
+
   function disableBluetooth() {
     console.log('disable bluetooth');
     defaultAdapter.disable();
@@ -96,14 +96,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var list = document.getElementById('device-list');
     list.appendChild(li);
   }
-  
+
   function connectGattServer(device) {
     console.log('Device name:' + device.name);
     console.log('Device address:' + device.address);
     /* TODO: Remove it when we added connect options*/
-    if (device.name === 'Polar H7 2AA27B' || device.name === 'Wahoo HRM V1.7') {
+    if (device.name === 'Polar H7 2AA27B' || device.name === 'Wahoo HRM V1.7' || device.name ==='MIO GLOBAL') {
       console.log('!!!!!!! Found HRM !!!!!!  ');
-      device.connectGatt(false).then(function onResolve(gatt){
+      console.log('!!!!!!! Stop Disocovery !!!!!!  ');
+      defaultAdapter.stopDiscovery().then(function onResolve(){
+         console.log('!!!!!!! Stop Disocovery done !!!!!!  ');
+         device.connectGatt(false).then(function onResolve(gatt){
          console.log('connectGatt, onResolve');
          gattClient = gatt;
         console.log('-------------> after resolved connection state:  ' + gatt.connectionState);
@@ -151,6 +154,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
              }
            }
          }
+      }, function onRejct(reason){
+      });//stopdiscovery
+
        }, function onReject(reason){
          console.log('connectGatt reject');
        }); //connectGatt resolve
@@ -163,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       // clean up device list
       var list = document.getElementById('device-list');
       while (list.firstChild) list.removeChild(list.firstChild);
-      
+
       defaultAdapter.startDiscovery().then(function onResolve(handle) {
         discoveryHandler = handle;
         discoveryHandler.ondevicefound = function onDeviceFound(evt) {
@@ -176,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
        }); //startdiscovery resolve
     }
   };
-  
+
   startNotiBtn.onclick = function startNotiBtnClick() {
     if (defaultAdapter && gattClient){
       for (var i in gattClient.services) {
